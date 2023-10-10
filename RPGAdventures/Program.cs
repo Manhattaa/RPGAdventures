@@ -1,9 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using NAudio.Wave;
 
 class Program
 {
     static void Main(string[] args)
+    {
+        //Path till låten
+        string audioFilePath = @"C:\Users\fadde\source\repos\RPGAdventure\RPGAdventure\bin\Debug\dragons2.wav";
+        PlayAudio(audioFilePath);
+        StartGame();
+    }
+
+    static async Task PlayAudio(string filePath)
+    {
+        try
+        {
+            using (WaveFileReader reader = new WaveFileReader(filePath))
+            {
+                using (WaveOutEvent waveOut = new WaveOutEvent())
+                {
+                    waveOut.Init(reader);
+                    waveOut.Play();
+                    while (waveOut.PlaybackState == PlaybackState.Playing)
+                    {
+                        await Task.Delay(100);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error occurred while playing audio: {ex.Message}");
+        }
+    }
+    //Synka ljud till text så det inte blockeras
+    static async Task StartGame()
+
     {
         Console.WriteLine("Welcome to The Vale!");
         Console.Write("Choose your Hero ");
@@ -172,6 +205,7 @@ class Program
                 // Display remaining HP
                 Console.WriteLine($"{protagonist.Name}'s HP: {protagonist.CurrentHealth}/{protagonist.MaxHealth}");
                 Console.WriteLine($"{foe.Name}'s HP: {foe.CurrentHealth}/{foe.MaxHealth}");
+                System.Threading.Thread.Sleep(1000);
             }
 
             if (!protagonist.IsAlive)
